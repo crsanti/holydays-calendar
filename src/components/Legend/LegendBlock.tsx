@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { Holyday } from "../model";
 import styled from "styled-components";
+import { Holyday } from "../../model";
 
 interface LegendBlockProps {
-  variant?: Holyday | 'selected';
+  variant: Holyday | "selected";
 }
 
 const Container = styled.div({
@@ -12,20 +12,18 @@ const Container = styled.div({
   padding: "0 13px",
 });
 
+const variantsMap: Record<LegendBlockProps["variant"], string> = {
+  local: "var(--local-holyday)",
+  regional: "var(--regional-holyday)",
+  national: "var(--national-holyday)",
+  selected: "var(--selected-day)",
+};
+
 const Square = styled.div<{ variant: LegendBlockProps["variant"] }>(({ variant }) => ({
   width: 13,
   height: 13,
   marginRight: 6,
-  backgroundColor:
-    variant === "local"
-      ? "var(--local-holyday)"
-      : variant === "regional"
-        ? "var(--regional-holyday)"
-        : variant === "national"
-          ? "var(--national-holyday)"
-          : variant === "selected"
-            ? "var(--selected-day)"
-            : undefined,
+  backgroundColor: variantsMap[variant],
 }));
 
 const LegendBlock: FC<LegendBlockProps> = ({ variant, children }) => {

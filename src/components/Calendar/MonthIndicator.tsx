@@ -1,7 +1,7 @@
 import { capitalize as prettify } from "lodash-es";
 import { VFC } from "react";
 import styled from "styled-components";
-import { formatDate } from "./utils";
+import { formatDate } from "../../utils";
 
 interface Props {
   month: number;

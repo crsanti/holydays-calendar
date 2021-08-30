@@ -1,11 +1,11 @@
 import { useCallback, useState, VFC } from "react";
 import styled from "styled-components";
-import Calendar from "./Calendar";
-import Legend from "./Legend";
-import Card from "./Card";
+import Calendar from "./components/Calendar";
+import Card from "./components/Card";
+import DaysIndicator from "./components/DaysIndicator/DaysIndicator";
+import Legend from "./components/Legend";
 import GlobalStyles from "./GlobalStyles";
 import { HolydaysByMonth } from "./model";
-import DaysIndicator from "./DaysIndicator";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
@@ -36,8 +36,6 @@ export const HOLYDAYS: HolydaysByMonth = {
     { day: 25, type: "national" },
   ],
 };
-
-
 
 const Main = styled(Card)({
   display: "flex",
@@ -73,9 +71,9 @@ const App: VFC = () => {
           return reachedLimit
             ? state
             : {
-              selectedDays: { ...state.selectedDays, [month]: [...state.selectedDays[month], day] },
-              total: state.total + 1,
-            };
+                selectedDays: { ...state.selectedDays, [month]: [...state.selectedDays[month], day] },
+                total: state.total + 1,
+              };
         }
       });
     },

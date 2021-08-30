@@ -1,8 +1,8 @@
-import { VFC, memo } from "react";
+import { memo, VFC } from "react";
 import styled from "styled-components";
+import { HolydaysByMonth } from "../../model";
 import DateGrid from "./DateGrid";
 import DaysOfWeek from "./DaysOfWeek";
-import { HolydaysByMonth } from "../model";
 import MonthIndicator from "./MonthIndicator";
 
 interface Props {

@@ -1,9 +1,9 @@
 import { capitalize } from "lodash-es";
 import { VFC } from "react";
 import styled from "styled-components";
-import GridCell from "./GridCell";
+import { formatDate } from "../../utils";
 import Container from "./Grid";
-import { formatDate } from "./utils";
+import GridCell from "./GridCell";
 
 const WeekDay = styled(GridCell)({
   fontWeight: 600,

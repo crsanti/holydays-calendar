@@ -1,10 +1,10 @@
-import React, { VFC } from "react";
 import { groupBy } from "lodash-es";
+import React, { VFC } from "react";
 import styled from "styled-components";
-import { Holyday, HolydaysByMonth } from "../model";
+import { Holyday, HolydaysByMonth } from "../../model";
 import Grid from "./Grid";
 import GridCell from "./GridCell";
-import { daysOf, getWeekDay, isWeekend } from "./utils";
+import { daysOf, getWeekDay, isWeekend } from "../../utils";
 
 interface ContainerProps {
   startColumn: number;
@@ -25,39 +25,39 @@ const Day = styled(GridCell)<DayProps>(({ variant }) => ({
   border: 0,
   fontWeight: 600,
   lineHeight: "var(--line-height)",
-  '&[data-variant]': {
+  "&[data-variant]": {
     borderRadius: 0,
   },
   padding: 0,
   backgroundColor: "transparent",
   ...(variant === "selected"
     ? {
-      cursor: "pointer",
-      color: "var(--white)",
-      backgroundColor: "var(--selected-day)",
-      "&:hover": {
-        // backgroundColor: "var(--disabled)",
-        // color: "var(--blue)",
-      },
-    }
+        cursor: "pointer",
+        color: "var(--white)",
+        backgroundColor: "var(--selected-day)",
+        "&:hover": {
+          // backgroundColor: "var(--disabled)",
+          // color: "var(--blue)",
+        },
+      }
     : variant === "national"
-      ? { color: "var(--white)", backgroundColor: "var(--national-holyday)" }
-      : variant === "regional"
-        ? { color: "var(--white)", backgroundColor: "var(--regional-holyday)" }
-        : variant === "local"
-          ? { color: "var(--white)", backgroundColor: "var(--local-holyday)" }
-          : {
-            fontWeight: 400,
-            cursor: "pointer",
-            "&:disabled": {
-              color: "var(--medium-grey)",
-              cursor: "default",
-            },
-            "&:not(:disabled):hover": {
-              backgroundColor: "var(--disabled)",
-              color: "var(--blue)",
-            },
-          }),
+    ? { color: "var(--white)", backgroundColor: "var(--national-holyday)" }
+    : variant === "regional"
+    ? { color: "var(--white)", backgroundColor: "var(--regional-holyday)" }
+    : variant === "local"
+    ? { color: "var(--white)", backgroundColor: "var(--local-holyday)" }
+    : {
+        fontWeight: 400,
+        cursor: "pointer",
+        "&:disabled": {
+          color: "var(--medium-grey)",
+          cursor: "default",
+        },
+        "&:not(:disabled):hover": {
+          backgroundColor: "var(--disabled)",
+          color: "var(--blue)",
+        },
+      }),
 }));
 
 interface Props {

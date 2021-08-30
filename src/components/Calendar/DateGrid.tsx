@@ -29,7 +29,6 @@ const Day = styled(GridCell)<DayProps>(({ variant }) => ({
     borderRadius: 0,
   },
   padding: 0,
-  backgroundColor: "transparent",
   ...(variant === "selected"
     ? {
         cursor: "pointer",
@@ -49,6 +48,7 @@ const Day = styled(GridCell)<DayProps>(({ variant }) => ({
     : {
         fontWeight: 400,
         cursor: "pointer",
+        backgroundColor: "transparent",
         "&:disabled": {
           color: "var(--medium-grey)",
           cursor: "default",

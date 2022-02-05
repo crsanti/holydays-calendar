@@ -2,7 +2,7 @@ import { useCallback, useState, VFC } from "react";
 import styled from "styled-components";
 import Calendar from "./components/Calendar";
 import Card from "./components/Card";
-import DaysIndicator from "./components/DaysIndicator/DaysIndicator";
+import DaysIndicator from "./components/DaysIndicator";
 import Legend from "./components/Legend";
 import GlobalStyles from "./GlobalStyles";
 import { HolydaysByMonth } from "./model";

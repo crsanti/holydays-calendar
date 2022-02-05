@@ -15,16 +15,14 @@ export const HOLYDAYS: HolydaysByMonth = {
     { day: 1, type: "national" },
     { day: 6, type: "national" },
   ],
-  // TODO: Move to next day if holyday is Sunday
-  // 2: [{ day: 28, type: "regional" }],
-  3: [{ day: 1, type: "regional" }],
+  2: [{ day: 28, type: "regional" }],
   4: [
-    { day: 1, type: "regional" },
-    { day: 2, type: "national" },
+    { day: 14, type: "regional" },
+    { day: 15, type: "national" },
   ],
-  5: [{ day: 1, type: "regional" }],
+  5: [{ day: 2, type: "regional" }],
   8: [
-    { day: 16, type: "regional" },
+    { day: 15, type: "regional" },
     { day: 19, type: "local" },
   ],
   9: [{ day: 8, type: "local" }],
@@ -33,7 +31,7 @@ export const HOLYDAYS: HolydaysByMonth = {
   12: [
     { day: 6, type: "national" },
     { day: 8, type: "national" },
-    { day: 25, type: "national" },
+    { day: 26, type: "national" },
   ],
 };
 

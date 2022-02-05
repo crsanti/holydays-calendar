@@ -7,7 +7,7 @@ const Container = styled.div({
   position: "sticky",
   top: 0,
   padding: 10,
-  marginBottom: -40,
+  marginBottom: -50,
   textAlign: "center",
   fontSize: 14,
 });

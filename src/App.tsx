@@ -10,7 +10,7 @@ import { HolydaysByMonth } from "./model";
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
 // Months starting with 1, days starting with 1
-export const HOLYDAYS: HolydaysByMonth = {
+const HOLYDAYS: HolydaysByMonth = {
   1: [
     { day: 1, type: "national" },
     { day: 6, type: "national" },
@@ -43,33 +43,35 @@ const Main = styled(Card)({
 
 interface State {
   total: number;
-  selectedDays: Record<number, number[]>;
+  holydays: HolydaysByMonth;
 }
 
 const EMPTY_HOLYDAYS: HolydaysByMonth[number] = [];
-const EMPTY_SELECTED_DAYS: number[] = [];
 
 const TOTAL_HOLYDAYS_TO_PICK = 23;
 const App: VFC = () => {
-  const [{ total, selectedDays }, setSelectedDays] = useState<State>({ selectedDays: {}, total: 0 });
+  const [{ total, holydays }, setSelectedDays] = useState<State>({ holydays: HOLYDAYS, total: 0 });
   const onClickDay = useCallback(
     (month: number, day: number) => {
+      console.log("month", month, "day", day);
       setSelectedDays((state) => {
         const reachedLimit = state.total + 1 > TOTAL_HOLYDAYS_TO_PICK;
-        if (!(month in state.selectedDays)) {
+        const holydaysMonth = state.holydays[month];
+
+        if (!holydaysMonth) {
           return reachedLimit
             ? state
-            : { selectedDays: { ...state.selectedDays, [month]: [day] }, total: state.total + 1 };
-        } else if (state.selectedDays[month].includes(day)) {
+            : { holydays: { ...state.holydays, [month]: [{ type: "selected", day }] }, total: state.total + 1 };
+        } else if (holydaysMonth.find((holyday) => holyday.day === day)) {
           return {
-            selectedDays: { ...state.selectedDays, [month]: state.selectedDays[month].filter((d) => d !== day) },
+            holydays: { ...state.holydays, [month]: holydaysMonth.filter((h) => h.day !== day) },
             total: state.total - 1,
           };
         } else {
           return reachedLimit
             ? state
             : {
-                selectedDays: { ...state.selectedDays, [month]: [...state.selectedDays[month], day] },
+                holydays: { ...state.holydays, [month]: [...holydaysMonth, { type: "selected", day }] },
                 total: state.total + 1,
               };
         }
@@ -85,15 +87,15 @@ const App: VFC = () => {
       </Legend>
       <Main>
         <GlobalStyles />
-        {Array.from({ length: 12 }, (_, month) => {
+        {Array.from({ length: 12 }, (_, index) => {
+          const month = index + 1;
           return (
             <Calendar
               key={month}
               month={month}
               year={year}
               onClickDay={onClickDay}
-              holydays={HOLYDAYS[month + 1] ?? EMPTY_HOLYDAYS}
-              selectedDays={selectedDays[month] ?? EMPTY_SELECTED_DAYS}
+              holydays={holydays[month] ?? EMPTY_HOLYDAYS}
             />
           );
         })}

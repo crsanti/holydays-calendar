@@ -1,5 +1,5 @@
 import { capitalize } from "lodash-es";
-import { VFC } from "react";
+import { memo, VFC } from "react";
 import styled from "styled-components";
 import { formatDate } from "../../utils";
 import Container from "./Grid";
@@ -22,4 +22,4 @@ const DaysOfWeek: VFC = () => {
   );
 };
 
-export default DaysOfWeek;
+export default memo(DaysOfWeek);

@@ -1,9 +1,9 @@
 import { FC } from "react";
 import styled from "styled-components";
-import { Holyday } from "../../model";
+import { HolydayType } from "../../model";
 
 interface LegendBlockProps {
-  variant: Holyday | "selected";
+  variant: HolydayType;
 }
 
 const Container = styled.div({

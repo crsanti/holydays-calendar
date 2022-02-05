@@ -9,7 +9,6 @@ interface Props {
   month: number;
   year: number;
   holydays: HolydaysByMonth[number];
-  selectedDays: number[];
   onClickDay(month: number, day: number): void;
 }
 
@@ -18,12 +17,12 @@ const Container = styled.div({
   padding: 20,
 });
 
-const Calendar: VFC<Props> = ({ month, year, onClickDay, selectedDays, holydays }) => {
+const Calendar: VFC<Props> = ({ month, year, onClickDay, holydays }) => {
   return (
     <Container>
       <MonthIndicator month={month} />
       <DaysOfWeek />
-      <DateGrid selectedDays={selectedDays} holydays={holydays} month={month} year={year} onClickDay={onClickDay} />
+      <DateGrid holydays={holydays} month={month} year={year} onClickDay={onClickDay} />
     </Container>
   );
 };

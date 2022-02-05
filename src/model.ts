@@ -1,2 +1,3 @@
-export type Holyday = "national" | "regional" | "local";
-export type HolydaysByMonth = Record<number, { type: Holyday; day: number }[]>;
+export type HolydaysByMonth = Record<number, Day[]>;
+export type Day = { type: HolydayType; day: number };
+export type HolydayType = "national" | "regional" | "local" | "selected";

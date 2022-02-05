@@ -1,5 +1,5 @@
 import { capitalize as prettify } from "lodash-es";
-import { VFC } from "react";
+import { memo, VFC } from "react";
 import styled from "styled-components";
 import { formatDate } from "../../utils";
 
@@ -18,4 +18,4 @@ const MonthIndicator: VFC<Props> = ({ month }) => {
   return <Container>{prettify(date)}</Container>;
 };
 
-export default MonthIndicator;
+export default memo(MonthIndicator);

@@ -1,15 +1,15 @@
 import styled, { CSSObject } from "styled-components";
-import { Holyday } from "../../model";
+import { HolydayType } from "../../model";
 import GridCell from "./GridCell";
 
 interface Props {
-  variant: "selected" | Holyday;
+  variant?: HolydayType;
 }
 
 // TODO: Try design with border radius
 // const BORDER_RADIUS = 8;
 
-const variants: Record<Props["variant"] | "default", CSSObject> = {
+const variants: Record<Required<Props>["variant"] | "default", CSSObject> = {
   selected: {
     cursor: "pointer",
     color: "var(--white)",
@@ -38,7 +38,7 @@ const Day = styled(GridCell)<Props>(({ variant }) => ({
   fontWeight: 600,
   lineHeight: "var(--line-height)",
   padding: 0,
-  ...(variants[variant] || variants.default),
+  ...variants[variant ?? "default"],
 }));
 
 export default Day;

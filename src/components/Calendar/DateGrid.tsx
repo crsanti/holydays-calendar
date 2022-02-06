@@ -1,9 +1,9 @@
 import { groupBy } from "lodash-es";
 import { VFC } from "react";
 import styled from "styled-components";
-import { HolydaysByMonth } from "../../model";
+import { HolyDay, HolydaysByMonth } from "../../model";
 import { daysOf, getWeekDay, isWeekend } from "../../utils";
-import Day from "./Day";
+import Day, { PositionVariant } from "./Day";
 import Grid from "./Grid";
 
 interface ContainerProps {
@@ -32,14 +32,38 @@ const DateGrid: VFC<Props> = ({ month, year, holydays, onClickDay }) => {
         const holyday = holydaysMap[day]?.[0];
         const disabled = (holyday && holyday.type !== "selected") || isWeekend(year, month, day);
 
+        const prevHolyday = holydaysMap[day - 1]?.[0];
+        const nextHolyday = holydaysMap[day + 1]?.[0];
+
+        const positionVariant = getPositionVariant(holyday, prevHolyday, nextHolyday);
+
         return (
-          <Day as="button" variant={holyday?.type} onClick={() => onClickDay(month, day)} key={day} disabled={disabled}>
+          <Day
+            as="button"
+            holydayType={holyday?.type}
+            onClick={() => onClickDay(month, day)}
+            key={day}
+            disabled={disabled}
+            positionVariant={positionVariant}
+          >
             {day}
           </Day>
         );
       })}
     </Container>
   );
+};
+
+type MaybeDay = HolyDay | undefined;
+const getPositionVariant = (
+  holyday: MaybeDay,
+  prevHolyday: MaybeDay,
+  nextHolyday: MaybeDay,
+): PositionVariant | undefined => {
+  let position: PositionVariant | undefined;
+  if (!holyday || (!prevHolyday && !nextHolyday)) return position;
+  if (!prevHolyday) return "first";
+  if (!nextHolyday) return "last";
 };
 
 export default DateGrid;

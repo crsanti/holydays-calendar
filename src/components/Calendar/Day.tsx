@@ -1,15 +1,17 @@
-import styled, { CSSObject } from "styled-components";
+import styled, { CSSObject, CSSProperties } from "styled-components";
 import { HolydayType } from "../../model";
 import GridCell from "./GridCell";
 
+export type PositionVariant = "first" | "last";
+
 interface Props {
-  variant?: HolydayType;
+  holydayType?: HolydayType;
+  positionVariant?: PositionVariant;
 }
 
-// TODO: Try design with border radius
-// const BORDER_RADIUS = 8;
+const BORDER_RADIUS = 8;
 
-const variants: Record<Required<Props>["variant"] | "default", CSSObject> = {
+const colorVariants: Record<Required<Props>["holydayType"] | "default", CSSObject> = {
   selected: {
     cursor: "pointer",
     color: "var(--white)",
@@ -33,12 +35,24 @@ const variants: Record<Required<Props>["variant"] | "default", CSSObject> = {
   },
 };
 
-const Day = styled(GridCell)<Props>(({ variant }) => ({
+const positionVariants: Record<PositionVariant, CSSProperties> = {
+  first: {
+    borderTopLeftRadius: BORDER_RADIUS,
+    borderBottomLeftRadius: BORDER_RADIUS,
+  },
+  last: {
+    borderTopRightRadius: BORDER_RADIUS,
+    borderBottomRightRadius: BORDER_RADIUS,
+  },
+};
+
+const Day = styled(GridCell)<Props>(({ holydayType, positionVariant }) => ({
   border: 0,
   fontWeight: 600,
   lineHeight: "var(--line-height)",
   padding: 0,
-  ...variants[variant ?? "default"],
+  ...colorVariants[holydayType ?? "default"],
+  ...(positionVariant && positionVariants[positionVariant]),
 }));
 
 export default Day;

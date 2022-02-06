@@ -9,7 +9,7 @@ import { HolydaysByMonth } from "./model";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
-// Months starting with 1, days starting with 1
+// NOTE: Months starting with 1, days starting with 1
 const HOLYDAYS: HolydaysByMonth = {
   1: [
     { day: 1, type: "national" },
@@ -79,7 +79,7 @@ const App: VFC = () => {
     },
     [setSelectedDays],
   );
-  const year = new Date().getFullYear();
+  const year = new Date().getUTCFullYear();
   return (
     <>
       <Legend>

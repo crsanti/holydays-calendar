@@ -53,7 +53,6 @@ const App: VFC = () => {
   const [{ total, holydays }, setSelectedDays] = useState<State>({ holydays: HOLYDAYS, total: 0 });
   const onClickDay = useCallback(
     (month: number, day: number) => {
-      console.log("month", month, "day", day);
       setSelectedDays((state) => {
         const reachedLimit = state.total + 1 > TOTAL_HOLYDAYS_TO_PICK;
         const holydaysMonth = state.holydays[month];

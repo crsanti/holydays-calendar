@@ -14,7 +14,8 @@ const Container = styled.div({
 });
 
 const MonthIndicator: VFC<Props> = ({ month }) => {
-  const date = formatDate(Date.UTC(1970, month, 1), { month: "long" });
+  // NOTE: month prop is not zero index based
+  const date = formatDate(Date.UTC(1970, month - 1, 1), { month: "long" });
   return <Container>{prettify(date)}</Container>;
 };
 

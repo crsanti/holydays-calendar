@@ -46,8 +46,6 @@ interface State {
   holydays: HolydaysByMonth;
 }
 
-const EMPTY_HOLYDAYS: HolydaysByMonth[number] = [];
-
 const TOTAL_HOLYDAYS_TO_PICK = 23;
 const App: VFC = () => {
   const [{ total, holydays }, setSelectedDays] = useState<State>({ holydays: HOLYDAYS, total: 0 });
@@ -88,15 +86,7 @@ const App: VFC = () => {
         <GlobalStyles />
         {Array.from({ length: 12 }, (_, index) => {
           const month = index + 1;
-          return (
-            <Calendar
-              key={month}
-              month={month}
-              year={year}
-              onClickDay={onClickDay}
-              holydays={holydays[month] ?? EMPTY_HOLYDAYS}
-            />
-          );
+          return <Calendar key={month} month={month} year={year} onClickDay={onClickDay} holydays={holydays} />;
         })}
       </Main>
     </>

@@ -8,7 +8,7 @@ import MonthIndicator from "./MonthIndicator";
 interface Props {
   month: number;
   year: number;
-  holydays: HolydaysByMonth[number];
+  holydays: HolydaysByMonth;
   onClickDay(month: number, day: number): void;
 }
 

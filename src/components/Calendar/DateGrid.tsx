@@ -1,5 +1,5 @@
 import { groupBy } from "lodash-es";
-import { VFC } from "react";
+import { VFC, useMemo } from "react";
 import styled from "styled-components";
 import { HolyDay, HolydaysByMonth } from "../../model";
 import { daysOf, getWeekDay, isWeekend } from "../../utils";
@@ -19,23 +19,29 @@ const Container = styled(Grid)<ContainerProps>(({ startColumn: gridColumn }) => 
 interface Props {
   month: number;
   year: number;
-  holydays: HolydaysByMonth[number];
+  holydays: HolydaysByMonth;
   onClickDay(month: number, day: number): void;
 }
 
 const DateGrid: VFC<Props> = ({ month, year, holydays, onClickDay }) => {
-  const holydaysMap = groupBy(holydays, "day");
+  const prevMonthHolydays = holydays[month - 1];
+  const nextMonthHolydays = holydays[month + 1];
+  const thisMonthHolydays = holydays[month];
+  const prevMonthHolydaysMap = useMemo(() => groupBy(prevMonthHolydays, "day"), [prevMonthHolydays]);
+  const nextMonthHolydaysMap = useMemo(() => groupBy(nextMonthHolydays, "day"), [nextMonthHolydays]);
+  const thisMonthHolydaysMap = useMemo(() => groupBy(thisMonthHolydays, "day"), [thisMonthHolydays]);
+
+  const daysOfMonth = daysOf(month, year);
+
   return (
     <Container startColumn={getWeekDay(year, month, 1) + 1}>
-      {Array.from({ length: daysOf(month, year) }, (_, index) => {
+      {Array.from({ length: daysOfMonth }, (_, index) => {
         const day = index + 1;
-        const holyday = holydaysMap[day]?.[0];
-        const disabled = (holyday && holyday.type !== "selected") || isWeekend(year, month, day);
-
-        const prevHolyday = holydaysMap[day - 1]?.[0];
-        const nextHolyday = holydaysMap[day + 1]?.[0];
-
+        const holyday = thisMonthHolydaysMap[day]?.[0];
+        const prevHolyday = (day === 1 ? prevMonthHolydaysMap[daysOf(month - 1, year)] : thisMonthHolydaysMap[day - 1])?.[0];
+        const nextHolyday = (day === daysOfMonth ? nextMonthHolydaysMap[1] : thisMonthHolydaysMap[day + 1])?.[0];
         const positionVariant = getPositionVariant(holyday, prevHolyday, nextHolyday);
+        const disabled = (holyday && holyday.type !== "selected") || isWeekend(year, month, day);
 
         return (
           <Day
@@ -55,11 +61,7 @@ const DateGrid: VFC<Props> = ({ month, year, holydays, onClickDay }) => {
 };
 
 type MaybeDay = HolyDay | undefined;
-const getPositionVariant = (
-  holyday: MaybeDay,
-  prevHolyday: MaybeDay,
-  nextHolyday: MaybeDay,
-): PositionVariant | undefined => {
+const getPositionVariant = (holyday: MaybeDay, prevHolyday: MaybeDay, nextHolyday: MaybeDay): PositionVariant | undefined => {
   let position: PositionVariant | undefined;
   if (!holyday || (!prevHolyday && !nextHolyday)) return position;
   if (!prevHolyday) return "first";

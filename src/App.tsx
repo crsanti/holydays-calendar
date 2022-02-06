@@ -7,6 +7,7 @@ import Legend from "./components/Legend";
 import { HOLYDAYS_TO_PICK, MONTHS_OF_YEAR } from "./constants";
 import GlobalStyles from "./GlobalStyles";
 import { HolydaysByMonth } from "./model";
+import { daysOf } from "./utils";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
@@ -88,15 +89,18 @@ const App: VFC = () => {
         <GlobalStyles />
         {Array.from({ length: MONTHS_OF_YEAR }, (_, index) => {
           const month = index + 1;
+          const prevMonthHolydays = holydays[month - 1];
+          const daysOfPrevMonth = daysOf(index, year);
+          const nextMonthHolydays = holydays[month + 1];
           return (
             <Calendar
               key={month}
               month={month}
               year={year}
               onClickDay={onClickDay}
-              thisMonthHolydays={holydays[month] ?? EMPTY_HOLYDAYS}
-              prevMonthHolydays={holydays[month - 1] ?? EMPTY_HOLYDAYS}
-              nextMonthHolydays={holydays[month + 1] ?? EMPTY_HOLYDAYS}
+              holydays={holydays[month] ?? EMPTY_HOLYDAYS}
+              isLastDayOfPrevMonthHolyday={!!prevMonthHolydays?.find(({ day }) => day === daysOfPrevMonth)}
+              isFirstDayOfNextMonthHolyday={!!nextMonthHolydays?.find(({ day }) => day === 1)}
             />
           );
         })}

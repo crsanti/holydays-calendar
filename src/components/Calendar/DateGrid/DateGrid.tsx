@@ -21,30 +21,35 @@ const Container = styled(Grid)<ContainerProps>(({ startColumn: gridColumn }) => 
 interface Props {
   month: number;
   year: number;
-  thisMonthHolydays: HolyDay[];
-  prevMonthHolydays: HolyDay[];
-  nextMonthHolydays: HolyDay[];
+  holydays: HolyDay[];
+  isLastDayOfPrevMonthHolyday: boolean;
+  isFirstDayOfNextMonthHolyday: boolean;
   onClickDay(month: number, day: number): void;
 }
 
-const DateGrid: VFC<Props> = ({ month, year, thisMonthHolydays, prevMonthHolydays, nextMonthHolydays, onClickDay }) => {
-  const prevMonthHolydaysMap = groupBy(prevMonthHolydays, "day");
-  const nextMonthHolydaysMap = groupBy(nextMonthHolydays, "day");
-  const thisMonthHolydaysMap = groupBy(thisMonthHolydays, "day");
+const DateGrid: VFC<Props> = ({
+  month,
+  year,
+  holydays,
+  isLastDayOfPrevMonthHolyday,
+  isFirstDayOfNextMonthHolyday,
+  onClickDay,
+}) => {
+  const thisMonthHolydaysMap = groupBy(holydays, "day");
 
   const daysOfMonth = daysOf(month, year);
 
-  // TODO: Look for top and bottom days to group without borders
   return (
     <Container startColumn={getWeekDay(year, month, 1) + 1}>
       {Array.from({ length: daysOfMonth }, (_, index) => {
         const day = index + 1;
         const holyday = thisMonthHolydaysMap[day]?.[0];
-        const prevHolyday = (day === 1 ? prevMonthHolydaysMap[daysOf(month - 1, year)] : thisMonthHolydaysMap[day - 1])?.[0];
-        const nextHolyday = (day === daysOfMonth ? nextMonthHolydaysMap[1] : thisMonthHolydaysMap[day + 1])?.[0];
-        const prevWeekHolyday = thisMonthHolydaysMap[day - DAYS_OF_WEEK]?.[0];
-        const nextWeekHolyday = thisMonthHolydaysMap[day + DAYS_OF_WEEK]?.[0];
-        const positionVariant = getPositionVariant(holyday, prevHolyday, nextHolyday, prevWeekHolyday, nextWeekHolyday);
+        const isPrevDayHolyday = !!(day === 1 ? isLastDayOfPrevMonthHolyday : thisMonthHolydaysMap[day - 1]?.[0]);
+        const isNextDayHolyday = !!(day === daysOfMonth ? isFirstDayOfNextMonthHolyday : thisMonthHolydaysMap[day + 1]?.[0]);
+        const isPrevWeekDayHolyday = !!thisMonthHolydaysMap[day - DAYS_OF_WEEK]?.[0];
+        const isNextWeekDayHolyday = !!thisMonthHolydaysMap[day + DAYS_OF_WEEK]?.[0];
+        const positionVariant =
+          holyday && getPositionVariant(isPrevDayHolyday, isNextDayHolyday, isPrevWeekDayHolyday, isNextWeekDayHolyday);
         const disabled = (holyday && holyday.type !== "selected") || isWeekend(year, month, day);
 
         return (

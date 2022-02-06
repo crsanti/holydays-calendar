@@ -1,4 +1,3 @@
-import { HolyDay } from "../../../model";
 import { PositionVariant } from "./Day";
 
 export const POSITION_VARIANT_TOP_LEFT = 0b0001;
@@ -25,18 +24,15 @@ export const positionVariantsMap: Record<number, PositionVariant> = {
 };
 
 export const getPositionVariant = (
-  holyday?: HolyDay,
-  prevHolyday?: HolyDay,
-  nextHolyday?: HolyDay,
-  prevWeekHolyday?: HolyDay,
-  nextWeekHolyday?: HolyDay,
+  prevHolyday: boolean,
+  isNextDayHolyday: boolean,
+  isPrevWeekDayHolyday: boolean,
+  nextWeekHolyday: boolean,
 ): PositionVariant | undefined => {
-  if (!holyday) return;
-
-  const topLeft = !prevWeekHolyday && !prevHolyday ? POSITION_VARIANT_TOP_LEFT : 0;
-  const topRight = !prevWeekHolyday && !nextHolyday ? POSITION_VARIANT_TOP_RIGHT : 0;
+  const topLeft = !isPrevWeekDayHolyday && !prevHolyday ? POSITION_VARIANT_TOP_LEFT : 0;
+  const topRight = !isPrevWeekDayHolyday && !isNextDayHolyday ? POSITION_VARIANT_TOP_RIGHT : 0;
   const bottomLeft = !prevHolyday && !nextWeekHolyday ? POSITION_VARIANT_BOTTOM_LEFT : 0;
-  const bottomRight = !nextHolyday && !nextWeekHolyday ? POSITION_VARIANT_BOTTOM_RIGHT : 0;
+  const bottomRight = !isNextDayHolyday && !nextWeekHolyday ? POSITION_VARIANT_BOTTOM_RIGHT : 0;
 
   const style = topLeft + topRight + bottomLeft + bottomRight;
   return positionVariantsMap[style];

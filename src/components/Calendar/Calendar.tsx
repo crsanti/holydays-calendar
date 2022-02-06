@@ -6,11 +6,11 @@ import DaysOfWeek from "./DaysOfWeek";
 import MonthIndicator from "./MonthIndicator";
 
 interface Props {
+  holydays: HolyDay[];
+  isFirstDayOfNextMonthHolyday: boolean;
+  isLastDayOfPrevMonthHolyday: boolean;
   month: number;
   year: number;
-  thisMonthHolydays: HolyDay[];
-  prevMonthHolydays: HolyDay[];
-  nextMonthHolydays: HolyDay[];
   onClickDay(month: number, day: number): void;
 }
 
@@ -19,18 +19,25 @@ const Container = styled.div({
   padding: 20,
 });
 
-const Calendar: VFC<Props> = ({ month, year, onClickDay, thisMonthHolydays, prevMonthHolydays, nextMonthHolydays }) => {
+const Calendar: VFC<Props> = ({
+  holydays,
+  isFirstDayOfNextMonthHolyday,
+  isLastDayOfPrevMonthHolyday,
+  month,
+  onClickDay,
+  year,
+}) => {
   return (
     <Container>
       <MonthIndicator month={month} />
       <DaysOfWeek />
       <DateGrid
-        thisMonthHolydays={thisMonthHolydays}
-        prevMonthHolydays={prevMonthHolydays}
-        nextMonthHolydays={nextMonthHolydays}
+        holydays={holydays}
+        isLastDayOfPrevMonthHolyday={isLastDayOfPrevMonthHolyday}
+        isFirstDayOfNextMonthHolyday={isFirstDayOfNextMonthHolyday}
         month={month}
-        year={year}
         onClickDay={onClickDay}
+        year={year}
       />
     </Container>
   );

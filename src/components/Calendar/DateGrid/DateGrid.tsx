@@ -1,10 +1,12 @@
 import { groupBy } from "lodash-es";
 import { VFC } from "react";
 import styled from "styled-components";
-import { HolyDay } from "../../model";
-import { daysOf, getWeekDay, isWeekend } from "../../utils";
-import Day, { PositionVariant } from "./Day";
-import Grid from "./Grid";
+import { DAYS_OF_WEEK } from "../../../constants";
+import { HolyDay } from "../../../model";
+import { daysOf, getWeekDay, isWeekend } from "../../../utils";
+import Grid from "../Grid";
+import { getPositionVariant } from "./DateGrid.utils";
+import Day from "./Day";
 
 interface ContainerProps {
   startColumn: number;
@@ -32,6 +34,7 @@ const DateGrid: VFC<Props> = ({ month, year, thisMonthHolydays, prevMonthHolyday
 
   const daysOfMonth = daysOf(month, year);
 
+  // TODO: Look for top and bottom days to group without borders
   return (
     <Container startColumn={getWeekDay(year, month, 1) + 1}>
       {Array.from({ length: daysOfMonth }, (_, index) => {
@@ -39,7 +42,9 @@ const DateGrid: VFC<Props> = ({ month, year, thisMonthHolydays, prevMonthHolyday
         const holyday = thisMonthHolydaysMap[day]?.[0];
         const prevHolyday = (day === 1 ? prevMonthHolydaysMap[daysOf(month - 1, year)] : thisMonthHolydaysMap[day - 1])?.[0];
         const nextHolyday = (day === daysOfMonth ? nextMonthHolydaysMap[1] : thisMonthHolydaysMap[day + 1])?.[0];
-        const positionVariant = getPositionVariant(holyday, prevHolyday, nextHolyday);
+        const prevWeekHolyday = thisMonthHolydaysMap[day - DAYS_OF_WEEK]?.[0];
+        const nextWeekHolyday = thisMonthHolydaysMap[day + DAYS_OF_WEEK]?.[0];
+        const positionVariant = getPositionVariant(holyday, prevHolyday, nextHolyday, prevWeekHolyday, nextWeekHolyday);
         const disabled = (holyday && holyday.type !== "selected") || isWeekend(year, month, day);
 
         return (
@@ -57,14 +62,6 @@ const DateGrid: VFC<Props> = ({ month, year, thisMonthHolydays, prevMonthHolyday
       })}
     </Container>
   );
-};
-
-type MaybeDay = HolyDay | undefined;
-const getPositionVariant = (holyday: MaybeDay, prevHolyday: MaybeDay, nextHolyday: MaybeDay): PositionVariant | undefined => {
-  let position: PositionVariant | undefined;
-  if (!holyday || (!prevHolyday && !nextHolyday)) return position;
-  if (!prevHolyday) return "first";
-  if (!nextHolyday) return "last";
 };
 
 export default DateGrid;

@@ -1,7 +1,7 @@
 import { groupBy } from "lodash-es";
-import { VFC, useMemo } from "react";
+import { VFC } from "react";
 import styled from "styled-components";
-import { HolyDay, HolydaysByMonth } from "../../model";
+import { HolyDay } from "../../model";
 import { daysOf, getWeekDay, isWeekend } from "../../utils";
 import Day, { PositionVariant } from "./Day";
 import Grid from "./Grid";
@@ -19,17 +19,16 @@ const Container = styled(Grid)<ContainerProps>(({ startColumn: gridColumn }) => 
 interface Props {
   month: number;
   year: number;
-  holydays: HolydaysByMonth;
+  thisMonthHolydays: HolyDay[];
+  prevMonthHolydays: HolyDay[];
+  nextMonthHolydays: HolyDay[];
   onClickDay(month: number, day: number): void;
 }
 
-const DateGrid: VFC<Props> = ({ month, year, holydays, onClickDay }) => {
-  const prevMonthHolydays = holydays[month - 1];
-  const nextMonthHolydays = holydays[month + 1];
-  const thisMonthHolydays = holydays[month];
-  const prevMonthHolydaysMap = useMemo(() => groupBy(prevMonthHolydays, "day"), [prevMonthHolydays]);
-  const nextMonthHolydaysMap = useMemo(() => groupBy(nextMonthHolydays, "day"), [nextMonthHolydays]);
-  const thisMonthHolydaysMap = useMemo(() => groupBy(thisMonthHolydays, "day"), [thisMonthHolydays]);
+const DateGrid: VFC<Props> = ({ month, year, thisMonthHolydays, prevMonthHolydays, nextMonthHolydays, onClickDay }) => {
+  const prevMonthHolydaysMap = groupBy(prevMonthHolydays, "day");
+  const nextMonthHolydaysMap = groupBy(nextMonthHolydays, "day");
+  const thisMonthHolydaysMap = groupBy(thisMonthHolydays, "day");
 
   const daysOfMonth = daysOf(month, year);
 

@@ -1,3 +1,5 @@
+import { DAYS_OF_WEEK } from "./constants";
+
 type DateArg = NonNullable<Parameters<Intl.DateTimeFormat["format"]>>[0];
 
 export const formatDate = (date: DateArg, options: Intl.DateTimeFormatOptions) => {
@@ -13,14 +15,13 @@ export const daysOf = (month: number, year: number): number => {
 export const getWeekDay = (year: number, month: number, day: number): number => {
   // Note: months are zero index based for date constructors
   const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
-  return (weekday + 6) % 7;
+  return (weekday + DAYS_OF_WEEK - 1) % DAYS_OF_WEEK;
 };
 
 export const isWeekend = (year: number, month: number, day: number) => {
   return getWeekDay(year, month, day) > 4;
 };
 
-const DAYS_OF_WEEK = 7;
 export const getDaysOfWeek = (weekday: Intl.DateTimeFormatOptions["weekday"]): string[] => {
   const { format } = new Intl.DateTimeFormat(navigator.language, { weekday });
   return Array.from({ length: DAYS_OF_WEEK }, (_, index) => {

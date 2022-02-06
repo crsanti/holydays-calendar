@@ -4,6 +4,7 @@ import Calendar from "./components/Calendar";
 import Card from "./components/Card";
 import DaysIndicator from "./components/DaysIndicator";
 import Legend from "./components/Legend";
+import { HOLYDAYS_TO_PICK, MONTHS_OF_YEAR } from "./constants";
 import GlobalStyles from "./GlobalStyles";
 import { HolydaysByMonth } from "./model";
 
@@ -46,13 +47,14 @@ interface State {
   holydays: HolydaysByMonth;
 }
 
-const TOTAL_HOLYDAYS_TO_PICK = 23;
+const EMPTY_HOLYDAYS: HolydaysByMonth[number] = [];
+
 const App: VFC = () => {
   const [{ total, holydays }, setSelectedDays] = useState<State>({ holydays: HOLYDAYS, total: 0 });
   const onClickDay = useCallback(
     (month: number, day: number) => {
       setSelectedDays((state) => {
-        const reachedLimit = state.total + 1 > TOTAL_HOLYDAYS_TO_PICK;
+        const reachedLimit = state.total + 1 > HOLYDAYS_TO_PICK;
         const holydaysMonth = state.holydays[month];
 
         if (!holydaysMonth) {
@@ -80,13 +82,23 @@ const App: VFC = () => {
   return (
     <>
       <Legend>
-        <DaysIndicator totalDays={TOTAL_HOLYDAYS_TO_PICK} remainingDays={TOTAL_HOLYDAYS_TO_PICK - total} />
+        <DaysIndicator totalDays={HOLYDAYS_TO_PICK} remainingDays={HOLYDAYS_TO_PICK - total} />
       </Legend>
       <Main>
         <GlobalStyles />
-        {Array.from({ length: 12 }, (_, index) => {
+        {Array.from({ length: MONTHS_OF_YEAR }, (_, index) => {
           const month = index + 1;
-          return <Calendar key={month} month={month} year={year} onClickDay={onClickDay} holydays={holydays} />;
+          return (
+            <Calendar
+              key={month}
+              month={month}
+              year={year}
+              onClickDay={onClickDay}
+              thisMonthHolydays={holydays[month] ?? EMPTY_HOLYDAYS}
+              prevMonthHolydays={holydays[month - 1] ?? EMPTY_HOLYDAYS}
+              nextMonthHolydays={holydays[month + 1] ?? EMPTY_HOLYDAYS}
+            />
+          );
         })}
       </Main>
     </>

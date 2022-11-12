@@ -1,9 +1,10 @@
-import { VFC } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 
-const Container = styled.div({
-  display: "inline-flex",
+const Root = styled.div({
+  display: "flex",
   justifyContent: "center",
+  position: "relative",
 });
 
 const Block = styled.div({
@@ -11,16 +12,27 @@ const Block = styled.div({
   fontSize: 13,
 });
 
+const Year = styled.div({
+  fontSize: 16,
+  marginLeft: "15px",
+  fontWeight: "bold",
+  position: "absolute",
+  left: 0,
+});
+
 interface Props {
-  remainingDays?: number;
-  totalDays?: number;
+  remainingDays: number;
+  totalDays: number;
+  year: number;
 }
-const DaysIndicator: VFC<Props> = ({ totalDays = 23, remainingDays = 23 }) => {
+
+const DaysIndicator: FC<Props> = ({ totalDays, remainingDays, year }) => {
   return (
-    <Container>
+    <Root>
       <Block>Total days: {totalDays}</Block>
       <Block>Remaining days: {remainingDays}</Block>
-    </Container>
+      <Year>{year}</Year>
+    </Root>
   );
 };
 

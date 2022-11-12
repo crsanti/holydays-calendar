@@ -1,5 +1,5 @@
 import { groupBy } from "lodash-es";
-import { VFC } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 import { DAYS_OF_WEEK } from "../../../constants";
 import { HolyDay } from "../../../model";
@@ -27,7 +27,7 @@ interface Props {
   onClickDay(month: number, day: number): void;
 }
 
-const DateGrid: VFC<Props> = ({
+const DateGrid: FC<Props> = ({
   month,
   year,
   holydays,

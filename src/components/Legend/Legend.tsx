@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import styled from "styled-components";
 import BaseCard from "../Card";
 import LegendBlock from "./LegendBlock";
@@ -24,7 +24,7 @@ const LegendBlockContainer = styled.div({
   flexWrap: "wrap",
 });
 
-const Legend: FC = ({ children }) => {
+const Legend: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Container>
       <Card>

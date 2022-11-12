@@ -1,5 +1,5 @@
 import { capitalize as prettify } from "lodash-es";
-import { memo, VFC } from "react";
+import { FC, memo, PropsWithChildren } from "react";
 import styled from "styled-components";
 import { formatDate } from "../../utils";
 
@@ -13,7 +13,7 @@ const Container = styled.div({
   fontSize: 14,
 });
 
-const MonthIndicator: VFC<Props> = ({ month }) => {
+const MonthIndicator: FC<PropsWithChildren<Props>> = ({ month }) => {
   // NOTE: month prop is not zero index based
   const date = formatDate(Date.UTC(1970, month - 1, 1), { month: "long" });
   return <Container>{prettify(date)}</Container>;

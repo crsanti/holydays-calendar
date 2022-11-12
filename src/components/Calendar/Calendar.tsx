@@ -1,4 +1,4 @@
-import { memo, VFC } from "react";
+import { memo, FC } from "react";
 import styled from "styled-components";
 import { HolyDay } from "../../model";
 import DateGrid from "./DateGrid";
@@ -19,7 +19,7 @@ const Container = styled.div({
   padding: 20,
 });
 
-const Calendar: VFC<Props> = ({
+const Calendar: FC<Props> = ({
   holydays,
   isFirstDayOfNextMonthHolyday,
   isLastDayOfPrevMonthHolyday,

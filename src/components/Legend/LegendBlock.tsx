@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import styled from "styled-components";
 import { HolydayType } from "../../model";
 
@@ -26,7 +26,7 @@ const Square = styled.div<{ variant: LegendBlockProps["variant"] }>(({ variant }
   backgroundColor: variantsMap[variant],
 }));
 
-const LegendBlock: FC<LegendBlockProps> = ({ variant, children }) => {
+const LegendBlock: FC<PropsWithChildren<LegendBlockProps>> = ({ variant, children }) => {
   return (
     <Container>
       <Square variant={variant} />

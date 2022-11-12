@@ -1,5 +1,5 @@
 import { capitalize } from "lodash-es";
-import { memo, VFC } from "react";
+import { memo, FC } from "react";
 import styled from "styled-components";
 import { getDaysOfWeek } from "../../utils";
 import Container from "./Grid";
@@ -11,7 +11,7 @@ const WeekDay = styled(GridCell)({
 
 const prettify = (weekDay: string) => capitalize(weekDay).replace(".", "");
 
-const DaysOfWeek: VFC = () => {
+const DaysOfWeek: FC = () => {
   return (
     <Container>
       {getDaysOfWeek("short").map((weekday) => (

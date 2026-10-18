@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useMemo } from "react";
 import styled from "styled-components";
 import Calendar from "./components/Calendar";
 import Card from "./components/Card";
@@ -6,8 +6,8 @@ import DaysIndicator from "./components/DaysIndicator";
 import Legend from "./components/Legend";
 import { HOLYDAYS_TO_PICK, MONTHS_OF_YEAR } from "./constants";
 import GlobalStyles from "./GlobalStyles";
-import { HolydaysByMonth } from "./model";
-import { daysOf } from "./utils";
+import { HolydaysByMonth, SelectedDaysByMonth } from "./model";
+import { daysOf, mergeHolydays } from "./utils";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
@@ -21,28 +21,19 @@ const EMPTY_HOLYDAYS: HolydaysByMonth[number] = [];
 
 interface Props {
   remainingHolyDays: number;
-  spendHolyDay(): void;
-  freeHolyDay(): void;
   year: number;
   holydaysMap: HolydaysByMonth;
+  selectedDays: SelectedDaysByMonth;
+  onToggleDay(year: number, month: number, day: number): void;
 }
 
-const FullYearCalendar: FC<Props> = ({ holydaysMap, year, remainingHolyDays, spendHolyDay, freeHolyDay }) => {
-  const [holydays, setSelectedDays] = useState<HolydaysByMonth>(holydaysMap);
+const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainingHolyDays, onToggleDay }) => {
+  const holydays = useMemo(() => mergeHolydays(holydaysMap, selectedDays), [holydaysMap, selectedDays]);
 
   const onClickDay = (month: number, day: number) => {
-    const canTakeMoreDays = remainingHolyDays - 1 >= 0;
-    const holydaysInMonth = holydays[month] ?? [];
-    if (holydaysInMonth.find((holyday) => holyday.day === day)) {
-      freeHolyDay();
-      setSelectedDays({ ...holydays, [month]: holydaysInMonth.filter((h) => h.day !== day) });
-    } else if (canTakeMoreDays) {
-      spendHolyDay();
-      setSelectedDays({
-        ...holydays,
-        [month]: [...holydaysInMonth, { type: "selected", day }],
-      });
-    }
+    const isFixedHolyday = holydaysMap[month]?.some((holyday) => holyday.day === day);
+    if (isFixedHolyday) return;
+    onToggleDay(year, month, day);
   };
 
   return (

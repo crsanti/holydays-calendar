@@ -1,4 +1,5 @@
 import { DAYS_OF_WEEK } from "./constants";
+import { HolyDay, HolydaysByMonth, SelectedDaysByMonth, SelectedDaysByYear } from "./model";
 
 type DateArg = NonNullable<Parameters<Intl.DateTimeFormat["format"]>>[0];
 
@@ -31,3 +32,21 @@ export const getDaysOfWeek = (weekday: Intl.DateTimeFormatOptions["weekday"]): s
     return format(Date.UTC(2021, 1, day));
   });
 };
+
+export const countSelectedDays = (selectedDays: SelectedDaysByYear): number =>
+  Object.values(selectedDays).reduce(
+    (total, byMonth) => total + Object.values(byMonth).reduce((sum, days) => sum + days.length, 0),
+    0
+  );
+
+/** Combines the fixed holydays of a year with the days the user selected for it. */
+export const mergeHolydays = (holydaysMap: HolydaysByMonth, selectedDays: SelectedDaysByMonth): HolydaysByMonth =>
+  Object.entries(selectedDays).reduce<HolydaysByMonth>(
+    (merged, [monthKey, days]) => {
+      const month = Number(monthKey);
+      const selected: HolyDay[] = days.map((day) => ({ type: "selected", day }));
+      merged[month] = (merged[month] ?? []).concat(selected);
+      return merged;
+    },
+    { ...holydaysMap }
+  );

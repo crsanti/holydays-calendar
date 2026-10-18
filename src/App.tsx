@@ -1,7 +1,11 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback } from "react";
 import { HOLYDAYS_TO_PICK } from "./constants";
 import FullYearCalendar from "./FullYearCalendar";
-import { HolydaysByMonth } from "./model";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+import { HolydaysByMonth, SelectedDaysByYear } from "./model";
+import { countSelectedDays } from "./utils";
+
+const SELECTED_DAYS_STORAGE_KEY = "holydays-calendar:selected-days";
 
 // NOTE: Months starting with 1, days starting with 1
 const PREV_YEAR_HOLYDAYS: HolydaysByMonth = {
@@ -55,24 +59,37 @@ const NEXT_YEAR_HOLYDAYS: HolydaysByMonth = {
 };
 
 const App: FC = () => {
-  const [remainingHolyDays, setRemainingHolydays] = useState(HOLYDAYS_TO_PICK);
+  const [selectedDays, setSelectedDays] = useLocalStorage<SelectedDaysByYear>(SELECTED_DAYS_STORAGE_KEY, {});
+  const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays);
 
-  const spendHolyDay = useCallback(() => setRemainingHolydays((prev) => prev - 1), []);
-  const freeHolyDay = useCallback(() => setRemainingHolydays((prev) => prev + 1), []);
+  const toggleDay = useCallback(
+    (year: number, month: number, day: number) => {
+      setSelectedDays((prev) => {
+        const daysInMonth = prev[year]?.[month] ?? [];
+        const isSelected = daysInMonth.includes(day);
+        const canTakeMoreDays = HOLYDAYS_TO_PICK - countSelectedDays(prev) > 0;
+        if (!isSelected && !canTakeMoreDays) return prev;
+
+        const nextDays = isSelected ? daysInMonth.filter((d) => d !== day) : [...daysInMonth, day];
+        return { ...prev, [year]: { ...prev[year], [month]: nextDays } };
+      });
+    },
+    [setSelectedDays]
+  );
 
   return (
     <>
       <FullYearCalendar
         remainingHolyDays={remainingHolyDays}
-        spendHolyDay={spendHolyDay}
-        freeHolyDay={freeHolyDay}
+        selectedDays={selectedDays[2025] ?? {}}
+        onToggleDay={toggleDay}
         year={2025}
         holydaysMap={PREV_YEAR_HOLYDAYS}
       />
       <FullYearCalendar
         remainingHolyDays={remainingHolyDays}
-        spendHolyDay={spendHolyDay}
-        freeHolyDay={freeHolyDay}
+        selectedDays={selectedDays[2026] ?? {}}
+        onToggleDay={toggleDay}
         year={2026}
         holydaysMap={NEXT_YEAR_HOLYDAYS}
       />

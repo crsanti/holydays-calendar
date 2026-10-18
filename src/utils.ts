@@ -1,5 +1,5 @@
 import { DAYS_OF_WEEK } from "./constants";
-import { HolyDay, SelectedDaysByMonth, SelectedDaysByYear } from "./model";
+import { HolyDay, HolydaysByMonth, HolydaysByYear, SelectedDaysByMonth, SelectedDaysByYear } from "./model";
 
 type DateArg = NonNullable<Parameters<Intl.DateTimeFormat["format"]>>[0];
 
@@ -33,11 +33,24 @@ export const getDaysOfWeek = (weekday: Intl.DateTimeFormatOptions["weekday"]): s
   });
 };
 
-/** Counts the days selected in the given years; stored days of any other year are ignored. */
-export const countSelectedDays = (selectedDays: SelectedDaysByYear, years: number[]): number =>
+/** Whether the day is one of the fixed holydays of the month map. */
+export const isFixedHolyday = (holydaysMap: HolydaysByMonth, month: number, day: number): boolean =>
+  !!holydaysMap[month]?.some((holyday) => holyday.day === day);
+
+/**
+ * Counts the days selected in the given years. Stored days of any other year are ignored, and so are
+ * the selected days that turned out to be fixed holydays: they stay stored but give their day back.
+ */
+export const countSelectedDays = (selectedDays: SelectedDaysByYear, years: number[], holydaysByYear: HolydaysByYear): number =>
   years.reduce((total, year) => {
     const byMonth: SelectedDaysByMonth = selectedDays[year] ?? {};
-    return total + Object.values(byMonth).reduce((sum, days) => sum + days.length, 0);
+    const holydays = holydaysByYear[year];
+    const holydaysMap: HolydaysByMonth = holydays?.status === "loaded" ? holydays.holydaysMap : {};
+    const counted = Object.entries(byMonth).reduce(
+      (sum, [month, days]) => sum + days.filter((day) => !isFixedHolyday(holydaysMap, Number(month), day)).length,
+      0,
+    );
+    return total + counted;
   }, 0);
 
 /** Combines the fixed holydays of a month with the days the user selected in it. */

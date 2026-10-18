@@ -1,5 +1,6 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import Attribution from "./components/Attribution";
+import Toast from "./components/Toast";
 import { HOLYDAYS_TO_PICK } from "./constants";
 import FullYearCalendar from "./FullYearCalendar";
 import { useHolydays } from "./hooks/useHolydays";
@@ -21,14 +22,25 @@ const App: FC = () => {
     NO_SELECTED_DAYS
   );
   const holydaysByYear = useHolydays(DISPLAYED_YEARS);
-  const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays, DISPLAYED_YEARS);
+  const [closedToastYears, setClosedToastYears] = useState<number[]>([]);
+  // NOTE: Never below 0: while a year's holydays are unknown, its selected holydays count again and can overdraw the budget
+  const remainingHolyDays = Math.max(0, HOLYDAYS_TO_PICK - countSelectedDays(selectedDays, DISPLAYED_YEARS, holydaysByYear));
+  const failedYears = DISPLAYED_YEARS.filter(
+    (year) => holydaysByYear[year]?.status === "failed" && !closedToastYears.includes(year),
+  );
+
+  // NOTE: `toggleDay` reads the holydays through a ref to keep its identity, so memo(Calendar) still skips renders
+  const holydaysByYearRef = useRef(holydaysByYear);
+  useEffect(() => {
+    holydaysByYearRef.current = holydaysByYear;
+  }, [holydaysByYear]);
 
   const toggleDay = useCallback(
     (year: number, month: number, day: number) => {
       setSelectedDays((prev) => {
         const daysInMonth = prev[year]?.[month] ?? [];
         const isSelected = daysInMonth.includes(day);
-        const canTakeMoreDays = HOLYDAYS_TO_PICK - countSelectedDays(prev, DISPLAYED_YEARS) > 0;
+        const canTakeMoreDays = HOLYDAYS_TO_PICK - countSelectedDays(prev, DISPLAYED_YEARS, holydaysByYearRef.current) > 0;
         if (!isSelected && !canTakeMoreDays) return prev;
 
         const nextDays = isSelected ? daysInMonth.filter((d) => d !== day) : [...daysInMonth, day];
@@ -58,6 +70,11 @@ const App: FC = () => {
         />
       ))}
       <Attribution />
+      {failedYears.length > 0 && (
+        <Toast onClose={() => setClosedToastYears((prev) => prev.concat(failedYears))}>
+          Could not get the {failedYears.join(" and ")} holydays from festivos.io.
+        </Toast>
+      )}
     </>
   );
 };

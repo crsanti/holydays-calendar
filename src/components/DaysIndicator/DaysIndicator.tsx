@@ -1,5 +1,6 @@
-import { FC, useId } from "react";
+import { FC } from "react";
 import styled from "styled-components";
+import Warning from "../Warning";
 
 // NOTE: Equal side columns keep the totals centered whatever the width of the year and the button.
 // Below 540px the single row no longer fits in the legend card, so the totals move to their own row.
@@ -16,39 +17,11 @@ const Root = styled.div({
   },
 });
 
-const Tooltip = styled.span({
-  position: "absolute",
-  top: "100%",
-  left: 0,
-  zIndex: 1,
-  width: "max-content",
-  maxWidth: 260,
-  padding: "6px 10px",
-  borderRadius: 6,
-  backgroundColor: "var(--grey)",
-  color: "var(--white)",
-  fontSize: 13,
-  fontWeight: 400,
-  lineHeight: "18px",
-  textAlign: "left",
-  visibility: "hidden",
-});
-
-// NOTE: The warning tooltip shows while the year (⚠️ included) is hovered or focused
 const Year = styled.div({
   gridArea: "year",
   justifySelf: "start",
-  position: "relative",
   fontSize: 16,
   fontWeight: "bold",
-  [`&:hover > ${Tooltip}, &:focus > ${Tooltip}`]: {
-    visibility: "visible",
-  },
-});
-
-const WarningIcon = styled.span({
-  marginLeft: 6,
-  cursor: "help",
 });
 
 const Totals = styled.div({
@@ -90,21 +63,9 @@ interface Props {
 }
 
 const DaysIndicator: FC<Props> = ({ totalDays, remainingDays, year, warning, onReset }) => {
-  const tooltipId = useId();
-
   return (
     <Root>
-      <Year tabIndex={warning ? 0 : undefined} aria-describedby={warning ? tooltipId : undefined}>
-        {year}
-        {warning && (
-          <>
-            <WarningIcon aria-hidden="true">⚠️</WarningIcon>
-            <Tooltip id={tooltipId} role="tooltip">
-              {warning}
-            </Tooltip>
-          </>
-        )}
-      </Year>
+      <Year>{warning ? <Warning text={warning}>{year}</Warning> : year}</Year>
       <Totals>
         <Block>Total days: {totalDays}</Block>
         <Block>Remaining days: {remainingDays}</Block>

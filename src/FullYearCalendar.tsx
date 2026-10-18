@@ -7,7 +7,7 @@ import Legend from "./components/Legend";
 import { HOLYDAYS_TO_PICK, MONTHS_OF_YEAR } from "./constants";
 import GlobalStyles from "./GlobalStyles";
 import { HolydaysByMonth, HolydaysState, SelectedDaysByMonth } from "./model";
-import { daysOf } from "./utils";
+import { daysOf, isFixedHolyday } from "./utils";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
 
@@ -34,7 +34,7 @@ const getMessages = (holydays: HolydaysState, year: number): { notice?: string; 
     case "loading":
       return { notice: `Loading the ${year} holydays…` };
     case "failed":
-      return { notice: `Could not load the ${year} holydays from festivos.io. Reload the page to try again.` };
+      return { warning: `Could not get the ${year} holydays from festivos.io. Reload the page to try again.` };
     case "not-published":
       return { warning: `festivos.io has not published the ${year} holydays yet.` };
     case "loaded":
@@ -56,8 +56,7 @@ const FullYearCalendar: FC<Props> = ({ holydays, selectedDays, year, remainingHo
   const holydaysMap = holydays.status === "loaded" ? holydays.holydaysMap : NO_HOLYDAYS;
   const { notice, warning } = getMessages(holydays, year);
 
-  const isHolyday = (month: number, day: number) =>
-    !!holydaysMap[month]?.some((holyday) => holyday.day === day) || !!selectedDays[month]?.includes(day);
+  const isHolyday = (month: number, day: number) => isFixedHolyday(holydaysMap, month, day) || !!selectedDays[month]?.includes(day);
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchHolydays } from "../api/festivos";
-import { HolydaysState } from "../model";
+import { HolydaysByYear, HolydaysState } from "../model";
 
 const NOT_PUBLISHED: HolydaysState = { status: "not-published" };
 const FAILED: HolydaysState = { status: "failed" };
@@ -10,8 +10,8 @@ const FAILED: HolydaysState = { status: "failed" };
  * A year is missing from the result until its request settles.
  * Pass a stable `years` array: a new one fetches every year again.
  */
-export const useHolydays = (years: number[]): Record<number, HolydaysState> => {
-  const [holydaysByYear, setHolydaysByYear] = useState<Record<number, HolydaysState>>({});
+export const useHolydays = (years: number[]): HolydaysByYear => {
+  const [holydaysByYear, setHolydaysByYear] = useState<HolydaysByYear>({});
 
   useEffect(() => {
     const controller = new AbortController();

@@ -10,6 +10,8 @@ export type HolydaysState =
   | ({ status: "loaded" } & YearHolydays)
   | { status: "not-published" }
   | { status: "failed" };
+/** Fixed holydays keyed by year. */
+export type HolydaysByYear = Record<number, HolydaysState>;
 
 /** Days picked by the user, keyed by month (1-based). Persisted in localStorage. */
 export type SelectedDaysByMonth = Record<number, number[]>;

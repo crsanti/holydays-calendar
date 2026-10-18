@@ -6,7 +6,7 @@ import DaysIndicator from "./components/DaysIndicator";
 import Legend from "./components/Legend";
 import { HOLYDAYS_TO_PICK, MONTHS_OF_YEAR } from "./constants";
 import GlobalStyles from "./GlobalStyles";
-import { HolydaysByMonth, SelectedDaysByMonth } from "./model";
+import { HolydaysByMonth, HolydaysState, SelectedDaysByMonth } from "./model";
 import { daysOf } from "./utils";
 
 // Theme https://mycolor.space/?hex=%237047EB&sub=1
@@ -17,20 +17,44 @@ const Main = styled(Card)({
   justifyContent: "center",
 });
 
+const Notice = styled.div({
+  padding: "0 15px 10px",
+  fontSize: 13,
+  lineHeight: "20px",
+});
+
+const NO_HOLYDAYS: HolydaysByMonth = {};
 const EMPTY_HOLYDAYS: HolydaysByMonth[number] = [];
 const EMPTY_SELECTED_DAYS: SelectedDaysByMonth[number] = [];
+
+// NOTE: A notice gets its own line in the legend, a warning a ⚠️ next to the year.
+// With neither, the year shows all its fixed holydays.
+const getMessages = (holydays: HolydaysState, year: number): { notice?: string; warning?: string } => {
+  switch (holydays.status) {
+    case "loading":
+      return { notice: `Loading the ${year} holydays…` };
+    case "failed":
+      return { notice: `Could not load the ${year} holydays from festivos.io. Reload the page to try again.` };
+    case "not-published":
+      return { warning: `festivos.io has not published the ${year} holydays yet.` };
+    case "loaded":
+      return holydays.localPending ? { warning: `festivos.io has not published the ${year} local holydays yet.` } : {};
+  }
+};
 
 interface Props {
   remainingHolyDays: number;
   year: number;
-  holydaysMap: HolydaysByMonth;
+  holydays: HolydaysState;
   selectedDays: SelectedDaysByMonth;
   onToggleDay(year: number, month: number, day: number): void;
   onResetDays(): void;
 }
 
-const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainingHolyDays, onToggleDay, onResetDays }) => {
+const FullYearCalendar: FC<Props> = ({ holydays, selectedDays, year, remainingHolyDays, onToggleDay, onResetDays }) => {
   const onClickDay = useCallback((month: number, day: number) => onToggleDay(year, month, day), [year, onToggleDay]);
+  const holydaysMap = holydays.status === "loaded" ? holydays.holydaysMap : NO_HOLYDAYS;
+  const { notice, warning } = getMessages(holydays, year);
 
   const isHolyday = (month: number, day: number) =>
     !!holydaysMap[month]?.some((holyday) => holyday.day === day) || !!selectedDays[month]?.includes(day);
@@ -38,26 +62,35 @@ const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainin
   return (
     <>
       <Legend>
-        <DaysIndicator totalDays={HOLYDAYS_TO_PICK} remainingDays={remainingHolyDays} year={year} onReset={onResetDays} />
+        <DaysIndicator
+          totalDays={HOLYDAYS_TO_PICK}
+          remainingDays={remainingHolyDays}
+          year={year}
+          warning={warning}
+          onReset={onResetDays}
+        />
+        {notice && <Notice>{notice}</Notice>}
       </Legend>
       <Main>
         <GlobalStyles />
-        {Array.from({ length: MONTHS_OF_YEAR }, (_, index) => {
-          const month = index + 1;
-          const daysOfPrevMonth = daysOf(index, year);
-          return (
-            <Calendar
-              key={month}
-              month={month}
-              year={year}
-              onClickDay={onClickDay}
-              holydays={holydaysMap[month] ?? EMPTY_HOLYDAYS}
-              selectedDays={selectedDays[month] ?? EMPTY_SELECTED_DAYS}
-              isLastDayOfPrevMonthHolyday={isHolyday(month - 1, daysOfPrevMonth)}
-              isFirstDayOfNextMonthHolyday={isHolyday(month + 1, 1)}
-            />
-          );
-        })}
+        {/* NOTE: The days stay hidden while the holydays load, so none can be selected over a holyday */}
+        {holydays.status !== "loading" &&
+          Array.from({ length: MONTHS_OF_YEAR }, (_, index) => {
+            const month = index + 1;
+            const daysOfPrevMonth = daysOf(index, year);
+            return (
+              <Calendar
+                key={month}
+                month={month}
+                year={year}
+                onClickDay={onClickDay}
+                holydays={holydaysMap[month] ?? EMPTY_HOLYDAYS}
+                selectedDays={selectedDays[month] ?? EMPTY_SELECTED_DAYS}
+                isLastDayOfPrevMonthHolyday={isHolyday(month - 1, daysOfPrevMonth)}
+                isFirstDayOfNextMonthHolyday={isHolyday(month + 1, 1)}
+              />
+            );
+          })}
       </Main>
     </>
   );

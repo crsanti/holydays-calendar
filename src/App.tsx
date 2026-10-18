@@ -1,76 +1,26 @@
 import { FC, useCallback } from "react";
+import Attribution from "./components/Attribution";
 import { HOLYDAYS_TO_PICK } from "./constants";
 import FullYearCalendar from "./FullYearCalendar";
+import { useHolydays } from "./hooks/useHolydays";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { HolydaysByMonth, SelectedDaysByYear } from "./model";
+import { HolydaysState, SelectedDaysByYear } from "./model";
 import { countSelectedDays } from "./utils";
 
 const SELECTED_DAYS_STORAGE_KEY = "holydays-calendar:selected-days";
 const NO_SELECTED_DAYS: SelectedDaysByYear = {};
+const LOADING_HOLYDAYS: HolydaysState = { status: "loading" };
 
-// NOTE: Months starting with 1, days starting with 1
-const PREV_YEAR_HOLYDAYS: HolydaysByMonth = {
-  1: [
-    { day: 1, type: "national" },
-    { day: 6, type: "national" },
-  ],
-  2: [{ day: 28, type: "regional" }],
-  4: [
-    { day: 17, type: "regional" },
-    { day: 18, type: "national" },
-  ],
-  5: [{ day: 1, type: "national" }],
-  8: [
-    { day: 15, type: "regional" },
-    { day: 19, type: "local" },
-  ],
-  9: [{ day: 8, type: "local" }],
-  10: [{ day: 13, type: "regional" }],
-  11: [{ day: 1, type: "national" }],
-  12: [
-    { day: 6, type: "national" },
-    { day: 8, type: "national" },
-    { day: 25, type: "national" },
-  ],
-};
-
-const NEXT_YEAR_HOLYDAYS: HolydaysByMonth = {
-  1: [
-    { day: 1, type: "national" },
-    { day: 6, type: "national" },
-  ],
-  2: [{ day: 28, type: "regional" }],
-  4: [
-    { day: 6, type: "regional" },
-    { day: 7, type: "national" },
-  ],
-  5: [{ day: 1, type: "regional" }],
-  8: [
-    { day: 15, type: "regional" },
-    { day: 19, type: "local" },
-  ],
-  9: [{ day: 9, type: "local" }],
-  10: [{ day: 12, type: "national" }],
-  11: [{ day: 1, type: "national" }],
-  12: [
-    { day: 6, type: "national" },
-    { day: 8, type: "national" },
-    { day: 25, type: "regional" },
-  ],
-};
-
-// NOTE: Only these years are shown, and only their selected days consume the budget
-const CALENDARS = [
-  { year: 2025, holydaysMap: PREV_YEAR_HOLYDAYS },
-  { year: 2026, holydaysMap: NEXT_YEAR_HOLYDAYS },
-];
-const DISPLAYED_YEARS = CALENDARS.map(({ year }) => year);
+// NOTE: Only the current year and the next one are shown, and only their selected days consume the budget
+const CURRENT_YEAR = new Date().getFullYear();
+const DISPLAYED_YEARS = [CURRENT_YEAR, CURRENT_YEAR + 1];
 
 const App: FC = () => {
   const [selectedDays, setSelectedDays, removeSelectedDays] = useLocalStorage(
     SELECTED_DAYS_STORAGE_KEY,
     NO_SELECTED_DAYS
   );
+  const holydaysByYear = useHolydays(DISPLAYED_YEARS);
   const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays, DISPLAYED_YEARS);
 
   const toggleDay = useCallback(
@@ -96,7 +46,7 @@ const App: FC = () => {
 
   return (
     <>
-      {CALENDARS.map(({ year, holydaysMap }) => (
+      {DISPLAYED_YEARS.map((year) => (
         <FullYearCalendar
           key={year}
           remainingHolyDays={remainingHolyDays}
@@ -104,9 +54,10 @@ const App: FC = () => {
           onToggleDay={toggleDay}
           onResetDays={resetDays}
           year={year}
-          holydaysMap={holydaysMap}
+          holydays={holydaysByYear[year] ?? LOADING_HOLYDAYS}
         />
       ))}
+      <Attribution />
     </>
   );
 };

@@ -6,6 +6,7 @@ import { HolydaysByMonth, SelectedDaysByYear } from "./model";
 import { countSelectedDays } from "./utils";
 
 const SELECTED_DAYS_STORAGE_KEY = "holydays-calendar:selected-days";
+const NO_SELECTED_DAYS: SelectedDaysByYear = {};
 
 // NOTE: Months starting with 1, days starting with 1
 const PREV_YEAR_HOLYDAYS: HolydaysByMonth = {
@@ -66,7 +67,10 @@ const CALENDARS = [
 const DISPLAYED_YEARS = CALENDARS.map(({ year }) => year);
 
 const App: FC = () => {
-  const [selectedDays, setSelectedDays] = useLocalStorage<SelectedDaysByYear>(SELECTED_DAYS_STORAGE_KEY, {});
+  const [selectedDays, setSelectedDays, removeSelectedDays] = useLocalStorage(
+    SELECTED_DAYS_STORAGE_KEY,
+    NO_SELECTED_DAYS
+  );
   const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays, DISPLAYED_YEARS);
 
   const toggleDay = useCallback(
@@ -84,6 +88,12 @@ const App: FC = () => {
     [setSelectedDays]
   );
 
+  const resetDays = useCallback(() => {
+    if (window.confirm("Remove the selected vacation days of every year? This cannot be undone.")) {
+      removeSelectedDays();
+    }
+  }, [removeSelectedDays]);
+
   return (
     <>
       {CALENDARS.map(({ year, holydaysMap }) => (
@@ -92,6 +102,7 @@ const App: FC = () => {
           remainingHolyDays={remainingHolyDays}
           selectedDays={selectedDays[year] ?? {}}
           onToggleDay={toggleDay}
+          onResetDays={resetDays}
           year={year}
           holydaysMap={holydaysMap}
         />

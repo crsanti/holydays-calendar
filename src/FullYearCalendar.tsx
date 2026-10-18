@@ -26,9 +26,10 @@ interface Props {
   holydaysMap: HolydaysByMonth;
   selectedDays: SelectedDaysByMonth;
   onToggleDay(year: number, month: number, day: number): void;
+  onResetDays(): void;
 }
 
-const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainingHolyDays, onToggleDay }) => {
+const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainingHolyDays, onToggleDay, onResetDays }) => {
   const onClickDay = useCallback((month: number, day: number) => onToggleDay(year, month, day), [year, onToggleDay]);
 
   const isHolyday = (month: number, day: number) =>
@@ -37,7 +38,7 @@ const FullYearCalendar: FC<Props> = ({ holydaysMap, selectedDays, year, remainin
   return (
     <>
       <Legend>
-        <DaysIndicator totalDays={HOLYDAYS_TO_PICK} remainingDays={remainingHolyDays} year={year} />
+        <DaysIndicator totalDays={HOLYDAYS_TO_PICK} remainingDays={remainingHolyDays} year={year} onReset={onResetDays} />
       </Legend>
       <Main>
         <GlobalStyles />

@@ -58,16 +58,23 @@ const NEXT_YEAR_HOLYDAYS: HolydaysByMonth = {
   ],
 };
 
+// NOTE: Only these years are shown, and only their selected days consume the budget
+const CALENDARS = [
+  { year: 2025, holydaysMap: PREV_YEAR_HOLYDAYS },
+  { year: 2026, holydaysMap: NEXT_YEAR_HOLYDAYS },
+];
+const DISPLAYED_YEARS = CALENDARS.map(({ year }) => year);
+
 const App: FC = () => {
   const [selectedDays, setSelectedDays] = useLocalStorage<SelectedDaysByYear>(SELECTED_DAYS_STORAGE_KEY, {});
-  const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays);
+  const remainingHolyDays = HOLYDAYS_TO_PICK - countSelectedDays(selectedDays, DISPLAYED_YEARS);
 
   const toggleDay = useCallback(
     (year: number, month: number, day: number) => {
       setSelectedDays((prev) => {
         const daysInMonth = prev[year]?.[month] ?? [];
         const isSelected = daysInMonth.includes(day);
-        const canTakeMoreDays = HOLYDAYS_TO_PICK - countSelectedDays(prev) > 0;
+        const canTakeMoreDays = HOLYDAYS_TO_PICK - countSelectedDays(prev, DISPLAYED_YEARS) > 0;
         if (!isSelected && !canTakeMoreDays) return prev;
 
         const nextDays = isSelected ? daysInMonth.filter((d) => d !== day) : [...daysInMonth, day];
@@ -79,20 +86,16 @@ const App: FC = () => {
 
   return (
     <>
-      <FullYearCalendar
-        remainingHolyDays={remainingHolyDays}
-        selectedDays={selectedDays[2025] ?? {}}
-        onToggleDay={toggleDay}
-        year={2025}
-        holydaysMap={PREV_YEAR_HOLYDAYS}
-      />
-      <FullYearCalendar
-        remainingHolyDays={remainingHolyDays}
-        selectedDays={selectedDays[2026] ?? {}}
-        onToggleDay={toggleDay}
-        year={2026}
-        holydaysMap={NEXT_YEAR_HOLYDAYS}
-      />
+      {CALENDARS.map(({ year, holydaysMap }) => (
+        <FullYearCalendar
+          key={year}
+          remainingHolyDays={remainingHolyDays}
+          selectedDays={selectedDays[year] ?? {}}
+          onToggleDay={toggleDay}
+          year={year}
+          holydaysMap={holydaysMap}
+        />
+      ))}
     </>
   );
 };

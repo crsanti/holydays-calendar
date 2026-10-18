@@ -1,5 +1,5 @@
 import { DAYS_OF_WEEK } from "./constants";
-import { HolyDay, HolydaysByMonth, SelectedDaysByMonth, SelectedDaysByYear } from "./model";
+import { HolyDay, SelectedDaysByMonth, SelectedDaysByYear } from "./model";
 
 type DateArg = NonNullable<Parameters<Intl.DateTimeFormat["format"]>>[0];
 
@@ -33,20 +33,15 @@ export const getDaysOfWeek = (weekday: Intl.DateTimeFormatOptions["weekday"]): s
   });
 };
 
-export const countSelectedDays = (selectedDays: SelectedDaysByYear): number =>
-  Object.values(selectedDays).reduce(
-    (total, byMonth) => total + Object.values(byMonth).reduce((sum, days) => sum + days.length, 0),
-    0
-  );
+/** Counts the days selected in the given years; stored days of any other year are ignored. */
+export const countSelectedDays = (selectedDays: SelectedDaysByYear, years: number[]): number =>
+  years.reduce((total, year) => {
+    const byMonth: SelectedDaysByMonth = selectedDays[year] ?? {};
+    return total + Object.values(byMonth).reduce((sum, days) => sum + days.length, 0);
+  }, 0);
 
-/** Combines the fixed holydays of a year with the days the user selected for it. */
-export const mergeHolydays = (holydaysMap: HolydaysByMonth, selectedDays: SelectedDaysByMonth): HolydaysByMonth =>
-  Object.entries(selectedDays).reduce<HolydaysByMonth>(
-    (merged, [monthKey, days]) => {
-      const month = Number(monthKey);
-      const selected: HolyDay[] = days.map((day) => ({ type: "selected", day }));
-      merged[month] = (merged[month] ?? []).concat(selected);
-      return merged;
-    },
-    { ...holydaysMap }
-  );
+/** Combines the fixed holydays of a month with the days the user selected in it. */
+export const mergeHolydays = (holydays: HolyDay[], selectedDays: number[]): HolyDay[] => {
+  const selected: HolyDay[] = selectedDays.map((day) => ({ type: "selected", day }));
+  return holydays.concat(selected);
+};

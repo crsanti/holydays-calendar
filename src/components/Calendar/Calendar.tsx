@@ -1,6 +1,7 @@
 import { memo, FC } from "react";
 import styled from "styled-components";
 import { HolyDay } from "../../model";
+import { mergeHolydays } from "../../utils";
 import DateGrid from "./DateGrid";
 import DaysOfWeek from "./DaysOfWeek";
 import MonthIndicator from "./MonthIndicator";
@@ -10,6 +11,7 @@ interface Props {
   isFirstDayOfNextMonthHolyday: boolean;
   isLastDayOfPrevMonthHolyday: boolean;
   month: number;
+  selectedDays: number[];
   year: number;
   onClickDay(month: number, day: number): void;
 }
@@ -25,6 +27,7 @@ const Calendar: FC<Props> = ({
   isLastDayOfPrevMonthHolyday,
   month,
   onClickDay,
+  selectedDays,
   year,
 }) => {
   return (
@@ -32,7 +35,7 @@ const Calendar: FC<Props> = ({
       <MonthIndicator month={month} />
       <DaysOfWeek />
       <DateGrid
-        holydays={holydays}
+        holydays={mergeHolydays(holydays, selectedDays)}
         isLastDayOfPrevMonthHolyday={isLastDayOfPrevMonthHolyday}
         isFirstDayOfNextMonthHolyday={isFirstDayOfNextMonthHolyday}
         month={month}
